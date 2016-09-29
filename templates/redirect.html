@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Redirecting</title>
+        <script>
+            setTimeout(function() {
+                window.location.href = '{{ url }}';
+            }, 2000);
+        </script>
+        <!-- Piwik -->
+        <script type="text/javascript">
+          var _paq = _paq || [];
+          _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+          _paq.push(["setCookieDomain", "*.urly-twirly-coryrwest.c9users.io"]);
+          _paq.push(["setDomains", ["*.urly-twirly-coryrwest.c9users.io","*.url.crwest.com"]]);
+          _paq.push(['trackPageView']);
+          _paq.push(['enableLinkTracking']);
+          (function() {
+            var u="//westroppstudios.com/a/";
+            _paq.push(['setTrackerUrl', u+'piwik.php']);
+            _paq.push(['setSiteId', 6]);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+          })();
+        </script>
+        <noscript><p><img src="//westroppstudios.com/a/piwik.php?idsite=6" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+
+    </head>
+    <body>
+        <h3>Redirecting to: {{ url }}</h3>
+    </body>
+</html>

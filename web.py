@@ -1,7 +1,7 @@
 import os
 import sys
-from flask import Flask
-from flask import request
+import re
+from flask import Flask, redirect, request, render_template
 app = Flask(__name__)
 
 sys.path.insert(1, os.path.join(sys.path[0], '.'))
@@ -15,12 +15,18 @@ def hello_world():
 
 @app.route('/help')
 def help():
-    return 'This is the help page. Hit /create with the <em>token</em> and a <em>url</em> in the query string to get your url.'
+    return 'This is the help page. Hit /create with the <em>token</em> and a <em>url</em> in the query string to get your url. Order is important and any hash symbols (#) and anything after them will be stripped.'
     
 @app.route('/create', methods=['GET'])
 def create():
     token = request.args.get('token')
-    url = request.args.get('url')
+    querystring = request.query_string.split('=', 2)
+    if len(querystring) < 3 :
+        return 'Could not parse url. Did you specify the token before the url in the querystring?';
+    url = querystring[2]
+    url = re.sub('&$', '', url)
+    if 'http' not in url :
+        return 'It doesn\'t look like you specified a correct url.'
     if token == '0891':
         part = shorturl.parts.generate_url_part()
         path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'urls')
@@ -37,7 +43,7 @@ def catch_all(path):
     if url == None:
         return 'That url does not exist'
     else:
-        return 'You want: %s' % url
+        return render_template('redirect.html', url=url)
 
 if __name__ == '__main__':
     port = os.getenv('PORT', 8080)
