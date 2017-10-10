@@ -1,13 +1,15 @@
 import os
 import sys
 import re
-from flask import Flask, redirect, request, render_template
+from flask import Flask, redirect, request, render_template, Markup
 app = Flask(__name__)
 
 sys.path.insert(1, os.path.join(sys.path[0], '.'))
 
 import shorturl.parts
 import shorturl.dirstore
+
+appToken = os.getenv('urly-twirly-token', '0891')
 
 @app.route('/')
 def hello_world():
@@ -27,7 +29,30 @@ def create():
     url = re.sub('&$', '', url)
     if 'http' not in url :
         return 'It doesn\'t look like you specified a correct url.'
-    if token == '0891':
+    if token == appToken:
+        part = shorturl.parts.generate_url_part()
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'urls')
+        shorturl.dirstore.save_url(path, part, url)
+        return 'Your short url is: <a href="' + os.path.join(request.url_root, part) + '"/>' + os.path.join(request.url_root, part) + '</a>'
+    else:
+        return 'Incorrect token'
+
+@app.route('/create', methods=['POST'])
+def create_post():
+    if 'token' not in request.json:
+        return 'You did not specify a token'
+    if 'url' not in request.json:
+        return 'You did not specify a url'
+    token = request.json['token']
+    url = request.json['url']
+    if 'http' not in url :
+        return 'It doesn\'t look like you specified a correct url.'
+    # My feeble attempt at protecting against injection attacks.
+    if '"' in url :
+        return 'The url cannot have double quotes (") in it.'
+    if '\'' in url :
+        return 'The url cannot have single quotes (\') in it.'
+    if token == appToken:
         part = shorturl.parts.generate_url_part()
         path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'urls')
         shorturl.dirstore.save_url(path, part, url)
@@ -39,7 +64,7 @@ def create():
 @app.route('/<path:path>')
 def catch_all(path):
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'urls')
-    url = shorturl.dirstore.load_url(root, path)
+    url = Markup(shorturl.dirstore.load_url(root, path))
     if url == None:
         return 'That url does not exist'
     else:
