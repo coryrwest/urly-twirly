@@ -47,7 +47,7 @@ six==1.5.2
 stevedore==0.14.1
 traceback2==1.4.0
 unittest2==1.1.0
-urllib3==1.7.1
+urllib3==1.26.5
 virtualenv==1.11.4
 virtualenv-clone==0.2.4
 virtualenvwrapper==4.1.1
